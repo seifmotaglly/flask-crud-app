@@ -8,7 +8,7 @@ from services.organization_service import (
     delete_organization,
     update_organization
 )
-from services.token_service import refresh_token_service, revoke_refresh_token_service, is_token_revoked
+from services.token_service import revoke_refresh_token_service, is_token_revoked
 
 protected_bp = Blueprint('protected', __name__)
 
@@ -52,14 +52,6 @@ def update_org(organization_id):
     data = request.get_json()
     is_token_revoked(get_jwt())
     return update_organization(organization_id, data)
-
-@protected_bp.route('/refresh-token', methods=['POST'])
-def refresh():
-    refresh_token = request.json.get('refresh_token')
-    is_token_revoked(refresh_token)
-    if not refresh_token:
-        return jsonify({"msg": "Missing refresh token"}), 400
-    return refresh_token_service(refresh_token)
 
 @protected_bp.route('/revoke-refresh-token', methods=['POST'])
 @jwt_required()
